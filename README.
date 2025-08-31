@@ -1,0 +1,222 @@
+-- LocalScript داخل StarterPlayerScripts
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- ==============================
+-- Full-Screen Command Overlay
+-- ==============================
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "CommandOverlay"
+ScreenGui.Parent = playerGui
+
+local overlay = Instance.new("Frame")
+overlay.Size = UDim2.new(1,0,1,0)
+overlay.Position = UDim2.new(0,0,0,0)
+overlay.BackgroundColor3 = Color3.fromRGB(0,0,0)
+overlay.BackgroundTransparency = 0.3
+overlay.Parent = ScreenGui
+
+local overlayLabel = Instance.new("TextLabel")
+overlayLabel.Size = UDim2.new(1,0,0,100)
+overlayLabel.Position = UDim2.new(0,0,0.4,0)
+overlayLabel.BackgroundTransparency = 1
+overlayLabel.Text = "اكتب V لتفعيل السكربت"
+overlayLabel.TextColor3 = Color3.fromRGB(255,255,255)
+overlayLabel.Font = Enum.Font.GothamBold
+overlayLabel.TextSize = 32
+overlayLabel.TextScaled = true
+overlayLabel.TextWrapped = true
+overlayLabel.Parent = overlay
+
+-- TextBox لإدخال الحرف
+local inputBox = Instance.new("TextBox")
+inputBox.Size = UDim2.new(0.5,0,0,50)
+inputBox.Position = UDim2.new(0.25,0,0.55,0)
+inputBox.BackgroundColor3 = Color3.fromRGB(50,50,50)
+inputBox.TextColor3 = Color3.fromRGB(255,255,255)
+inputBox.Font = Enum.Font.GothamBold
+inputBox.TextSize = 24
+inputBox.PlaceholderText = "V"
+inputBox.ClearTextOnFocus = true
+inputBox.Text = ""
+inputBox.Parent = overlay
+inputBox.TextScaled = true
+
+-- ==============================
+-- Info GUI
+-- ==============================
+local infoGui = Instance.new("Frame")
+infoGui.Size = UDim2.new(0,420,0,320)
+infoGui.Position = UDim2.new(0.5,-210,0.5,-160)
+infoGui.BackgroundColor3 = Color3.fromRGB(28,28,28)
+infoGui.AnchorPoint = Vector2.new(0.5,0.5)
+infoGui.Visible = false
+infoGui.Active = true
+infoGui.Draggable = true
+infoGui.BorderSizePixel = 0
+infoGui.Parent = ScreenGui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1,0,0,40)
+title.BackgroundTransparency = 1
+title.Text = "معلومات اللاعب"
+title.TextColor3 = Color3.fromRGB(255,255,255)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 24
+title.Parent = infoGui
+
+local thumbnail = Instance.new("ImageLabel")
+thumbnail.Size = UDim2.new(0,100,0,100)
+thumbnail.Position = UDim2.new(0,10,0,50)
+thumbnail.BackgroundColor3 = Color3.fromRGB(50,50,50)
+thumbnail.BorderSizePixel = 0
+thumbnail.Parent = infoGui
+
+local nameLabel = Instance.new("TextLabel")
+nameLabel.Size = UDim2.new(0,250,0,30)
+nameLabel.Position = UDim2.new(0,120,0,50)
+nameLabel.BackgroundTransparency = 1
+nameLabel.TextColor3 = Color3.fromRGB(255,255,255)
+nameLabel.Font = Enum.Font.GothamBold
+nameLabel.TextSize = 20
+nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+nameLabel.Parent = infoGui
+
+local idLabel = Instance.new("TextLabel")
+idLabel.Size = UDim2.new(0,250,0,30)
+idLabel.Position = UDim2.new(0,120,0,85)
+idLabel.BackgroundTransparency = 1
+idLabel.TextColor3 = Color3.fromRGB(255,255,255)
+idLabel.Font = Enum.Font.Gotham
+idLabel.TextSize = 18
+idLabel.TextXAlignment = Enum.TextXAlignment.Left
+idLabel.Parent = infoGui
+
+local timeLabel = Instance.new("TextLabel")
+timeLabel.Size = UDim2.new(0,250,0,30)
+timeLabel.Position = UDim2.new(0,10,0,170)
+timeLabel.BackgroundTransparency = 1
+timeLabel.TextColor3 = Color3.fromRGB(255,255,255)
+timeLabel.Font = Enum.Font.Gotham
+timeLabel.TextSize = 18
+timeLabel.TextXAlignment = Enum.TextXAlignment.Left
+timeLabel.Parent = infoGui
+
+local playersCountLabel = Instance.new("TextLabel")
+playersCountLabel.Size = UDim2.new(0,250,0,30)
+playersCountLabel.Position = UDim2.new(0,10,0,200)
+playersCountLabel.BackgroundTransparency = 1
+playersCountLabel.TextColor3 = Color3.fromRGB(255,255,255)
+playersCountLabel.Font = Enum.Font.Gotham
+playersCountLabel.TextSize = 18
+playersCountLabel.TextXAlignment = Enum.TextXAlignment.Left
+playersCountLabel.Parent = infoGui
+
+-- Copy Button Function
+local function createCopyButton(position, textToCopy)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0,80,0,25)
+    btn.Position = position
+    btn.Text = "نسخ"
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 16
+    btn.BackgroundColor3 = Color3.fromRGB(70,70,70)
+    btn.TextColor3 = Color3.fromRGB(255,255,255)
+    btn.BorderSizePixel = 0
+    btn.Parent = infoGui
+    btn.MouseButton1Click:Connect(function()
+        pcall(function() setclipboard(textToCopy) end)
+    end)
+    return btn
+end
+
+local nameBtn = createCopyButton(UDim2.new(0,340,0,50), player.Name)
+local idBtn = createCopyButton(UDim2.new(0,340,0,85), tostring(player.UserId))
+local timeBtn = createCopyButton(UDim2.new(0,270,0,170), "00 ساعات : 00 دقائق : 00 ثواني")
+local playersBtn = createCopyButton(UDim2.new(0,270,0,200), tostring(#Players:GetPlayers()))
+
+nameLabel.Text = "الاسم: "..player.Name
+idLabel.Text = "معرف اللاعب: "..tostring(player.UserId)
+playersCountLabel.Text = "عدد اللاعبين: "..tostring(#Players:GetPlayers())
+
+local thumbType = Enum.ThumbnailType.AvatarBust
+local thumbSize = Enum.ThumbnailSize.Size100x100
+local content,_ = Players:GetUserThumbnailAsync(player.UserId, thumbType, thumbSize)
+thumbnail.Image = content
+
+local totalSeconds = 0
+local arabic = true
+
+local function formatTime(sec)
+    local h = math.floor(sec/3600)
+    local m = math.floor((sec%3600)/60)
+    local s = sec%60
+    if arabic then
+        return string.format("%02d ساعات : %02d دقائق : %02d ثواني",h,m,s)
+    else
+        return string.format("%02d Hours : %02d Minutes : %02d Seconds",h,m,s)
+    end
+end
+
+RunService.RenderStepped:Connect(function(dt)
+    totalSeconds = totalSeconds + dt
+    local formattedTime = formatTime(math.floor(totalSeconds))
+    timeLabel.Text = "وقت التشغيل: "..formattedTime
+end)
+
+-- ==============================
+-- Execute Script on V
+-- ==============================
+inputBox.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        if inputBox.Text:lower() == "v" then
+            overlay:Destroy()
+            infoGui.Visible = true
+            arabic = not arabic
+
+            -- رسالة تم دخول
+            local enterMsg = Instance.new("TextLabel")
+            enterMsg.Size = UDim2.new(0,200,0,30)
+            enterMsg.Position = UDim2.new(0.5,-100,0.85,0)
+            enterMsg.BackgroundColor3 = Color3.fromRGB(0,0,0)
+            enterMsg.TextColor3 = Color3.fromRGB(0,255,0)
+            enterMsg.Font = Enum.Font.GothamBold
+            enterMsg.TextSize = 20
+            enterMsg.Text = "تم دخول"
+            enterMsg.AnchorPoint = Vector2.new(0.5,0)
+            enterMsg.Parent = ScreenGui
+            delay(2,function() enterMsg:Destroy() end)
+
+            -- رسالة تم صنعه من علي
+            local msg = Instance.new("TextLabel")
+            msg.Size = UDim2.new(0,200,0,30)
+            msg.Position = UDim2.new(0.5,-100,0.9,0)
+            msg.BackgroundColor3 = Color3.fromRGB(0,0,0)
+            msg.TextColor3 = Color3.fromRGB(255,255,255)
+            msg.Font = Enum.Font.GothamBold
+            msg.TextSize = 18
+            msg.Text = "تم صنعه من علي"
+            msg.AnchorPoint = Vector2.new(0.5,0)
+            msg.Parent = ScreenGui
+            delay(5,function() msg:Destroy() end)
+        end
+    end
+end)
+
+-- ###########################################
+-- ######### FILLER / OBFUSCATION ###########
+-- ###########################################
+
+for i=1,550 do local dummy=i end
+for i=1,50 do local a=i*2 end
+-- تعليقات ضخمة لتعقيد النسخة
+--[[ 
+████████████████████████████████████████████████████████████████████
+█                                                                  █
+█                   SCRIPT PROTECTED / OBFUSCATED                █
+█                                                                  █
+████████████████████████████████████████████████████████████████████
+--]]
